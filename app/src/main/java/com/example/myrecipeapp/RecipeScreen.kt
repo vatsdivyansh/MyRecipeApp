@@ -1,6 +1,7 @@
 package com.example.myrecipeapp
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 
 
 import androidx.compose.ui.layout.ContentScale
@@ -28,24 +29,27 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 
 @Composable
-fun RecipeScreen(modifier: Modifier = Modifier){
+fun RecipeScreen(modifier: Modifier = Modifier ,
+                 viewstate:MainViewModel.RecipeState,
+                 navigateToDetail : (Category) -> Unit){
     // We want to use our viewModel here becoz that will allows us to get data
     val recipeViewModel:MainViewModel = viewModel()
-    val viewState by recipeViewModel.categoriesState
+//    val viewState by recipeViewModel.categoriesState -> we are getting rid of viewState defined here and passing it inside RecipeScreen() . so now the recipe screen will nedd the viewState as well
     // the UI that I'm going to have is a box ->
     Box(modifier =Modifier.fillMaxSize() ){
         when{
-           viewState.loading -> {
+           viewstate.loading -> {
              CircularProgressIndicator(progress = 0.89f, modifier.align(Alignment.Center))
 
           }
-            viewState.error!=null-> {
+            viewstate.error!=null-> {
                 Text("ERROR OCCURED")
             }
             else->{
 
                 // display categories
-                CategoryScreen(categories = viewState.list)
+                // when we are not loading and we also dont have error then we show list -->
+                CategoryScreen(categories = viewstate.list , navigateToDetail)
 
 
             }
@@ -54,11 +58,11 @@ fun RecipeScreen(modifier: Modifier = Modifier){
     }
 }
 @Composable
-fun CategoryScreen(categories:List<Category>){
+fun CategoryScreen(categories:List<Category> , navigateToDetail : (Category) -> Unit){
     LazyVerticalGrid(GridCells.Fixed(2) , modifier = Modifier.fillMaxSize() ){
         items(categories){
             category ->
-            CategoryItem(category = category)
+            CategoryItem(category = category ,  navigateToDetail)
         }
 
     }
@@ -68,11 +72,15 @@ fun CategoryScreen(categories:List<Category>){
 
 
 @Composable
-// how each item should look like
-fun CategoryItem(category:Category){
+// how each item should look like--> // to allow the navigation we need to pass navigateToDetail inside CategoryItem() function
+fun CategoryItem(category:Category ,
+                 navigateToDetail : (Category) -> Unit
+                 ){
     Column(modifier = Modifier
         .padding(16.dp)
-        .fillMaxSize() , horizontalAlignment = Alignment.CenterHorizontally) {
+        .fillMaxSize()
+        .clickable { navigateToDetail(category) }
+        ,horizontalAlignment = Alignment.CenterHorizontally) {
         // this is how the Image of items looks like on UI->
         Image(
             painter = rememberAsyncImagePainter(model = category.strCategoryThumb),

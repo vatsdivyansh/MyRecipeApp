@@ -23,18 +23,26 @@ class MainViewModel: ViewModel() {
 
     private fun fetchCategories(){
         // fetchCategories is a function  that we need to call when we want to display anything
+        // launching the coroutines that allows us to call functions that are suspend function i.e defined using suspend keyword i.e the fucntions that dont happens synchronouslhy but happens in the backgroung
+
         viewModelScope.launch {
+            // now we will use try and catch becoz something may go wrong e.g no internet connection etc etc..
             try {
-                val response = recipeService.getCategories()
-                _categoriesState.value = _categoriesState.value.copy(
-                    list = response.categories,
-                    loading = false,
-                    error = null
+                // if something goes wrong we dont want to execute this  try block  code
+
+                val response = recipeService.getCategories() // inorder to get something from internet we need to put that in suspend function. This line calls the getCategories function from the recipeService and stores it in the response . here this function is likely to make a network call to fetch categories from the internet
+                _categoriesState.value = _categoriesState.value.copy( // updates the value of  _categoriesState by copying the current state and modyfying soecific fields
+                     list = response.categories, // set the 'list' field of the new state by copying the values obtained from the 'response'
+                    loading = false, // set the loading field  of the new state to false indicating that the data has finished loading
+                    error = null // set the error filed of the we state to null indicating that there are no errors
                 )
 
             }
             catch(e:Exception){
+                // when we get an error
+
                 _categoriesState.value = _categoriesState.value.copy(
+                    // when we get an error we say are not not loading anymore but we do have an error ->
                     loading = false ,
                     error = "Error fetching categories ${e.message}"
                 )

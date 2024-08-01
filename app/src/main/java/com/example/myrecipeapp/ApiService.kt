@@ -1,9 +1,12 @@
 package com.example.myrecipeapp
+import retrofit2.Response
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 import retrofit2.http.GET
+// day 9 lec 139 -->
+
 private val retrofit = Retrofit.Builder().baseUrl("www.themealdb.com/api/json/v1/1/")
     .addConverterFactory(GsonConverterFactory.create())
     .build() // role of this code-> this code make a connection with the base URL in such a way that the data is readable as objects in Kotlin
@@ -17,7 +20,8 @@ interface ApiService{
 
 
 
-    suspend fun getCategories():CategoriesResponse
+//    suspend fun getCategories(): Response<List<Category>>
+    suspend fun getCategories():CategoriesResponse // here we are getting response and putting it into a List<Category> i.e CategoriesResponse
     // role of suspend keyword here->Sure! The suspend keyword in suspend fun getCategories(): CategoriesResponse means that the function can pause its execution to wait for a long-running operation (like a network request) to complete, and then resume once it's done, all without blocking the thread. This ensures that the function can perform its task without freezing the app's user interface.
     // because tasks here arre asynchronous
     // suspend keyword says I will come back once I'm done executing than it runs on the background or wait for the response  so to speak
